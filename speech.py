@@ -1,39 +1,52 @@
 """
 Speech module for Jarvis AI
-Handles all text-to-speech functionality.
+Uses Microsoft Edge TTS + VLC for playback
 """
 
-import pyttsx3
-from config import VOICE_RATE, VOICE_VOLUME, VOICE_ID
+import asyncio
+import os
+import tempfile
+import time
 
-# Initialize engine
-engine = pyttsx3.init()
+import edge_tts
+import vlc
 
-# Apply configuration
-engine.setProperty("rate", VOICE_RATE)
-engine.setProperty("volume", VOICE_VOLUME)
+from config import ASSISTANT_NAME, VOICE
 
-voices = engine.getProperty("voices")
-if voices and len(voices) > VOICE_ID:
-    engine.setProperty("voice", voices[VOICE_ID].id)
+
+async def _generate_audio(text: str):
+    communicate = edge_tts.Communicate(text, VOICE)
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp:
+        filename = temp.name
+
+    await communicate.save(filename)
+    return filename
 
 
 def speak(text: str):
-    """
-    Speak the given text aloud.
-    """
+    print(f"{ASSISTANT_NAME}: {text}")
+
+    filename = asyncio.run(_generate_audio(text))
 
     try:
-        print(f"Jarvis: {text}")
-        engine.say(text)
-        engine.runAndWait()
+        player = vlc.MediaPlayer(filename)
 
-    except Exception as e:
-        print(f"Speech Error: {e}")
+        player.play()
 
+        # Give VLC time to start
+        time.sleep(0.2)
 
-def stop():
-    """
-    Stop the speech engine.
-    """
-    engine.stop()
+        while player.is_playing():
+            time.sleep(0.1)
+
+        player.stop()
+
+    finally:
+        try:
+            os.remove(filename)
+        except PermissionError:
+            # VLC may still have the file open for a brief moment
+            time.sleep(0.5)
+            if os.path.exists(filename):
+                os.remove(filename)
