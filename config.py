@@ -24,7 +24,8 @@ WAKE_WORD = "jarvis"
 # Speech Configuration
 # ==========================================
 
-VOICE = "en-US-AndrewNeural"
+VOICE = "en-US-GuyNeural"
+
 
 VOICE_RATE = 180
 
