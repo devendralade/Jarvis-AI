@@ -13,6 +13,7 @@ from commands.system_commands import (
 )
 from commands.screenshot_commands import take_screenshot
 from commands.volume_commands import volume_control
+from commands.media_commands import media_control
 
 
 
@@ -58,9 +59,12 @@ def main():
         if volume_control(command):
            continue
 
+        if media_control(command):
+           continue
+
 
         if command == "exit":
-            speak("Goodbye.")
+            speak("GoodBye.")
             break
 
         # Give the microphone a moment to fully release
