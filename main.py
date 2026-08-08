@@ -14,6 +14,8 @@ from commands.system_commands import (
 from commands.screenshot_commands import take_screenshot
 from commands.volume_commands import volume_control
 from commands.media_commands import media_control
+from commands.time_commands import time_control , date_control
+from commands.weather_commands import weather_control
 
 
 
@@ -60,6 +62,15 @@ def main():
            continue
 
         if media_control(command):
+           continue
+
+        if time_control(command):
+           continue
+
+        if date_control(command):
+           continue
+
+        if weather_control(command):
            continue
 
 
